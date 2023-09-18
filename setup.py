@@ -41,8 +41,9 @@ setuptools.setup(
     install_requires=[
         "torch>=1.7.0,!=1.8.0",  # excludes torch v1.8.0
         "onnx",
-        "onnxruntime==1.10.0",
-        "transformers>4.6.1",
+        "onnxruntime==1.15.1",
+        "onnxruntime-openvino",
+        "transformers>4.20.0",
         "progress>=1.5",
         "sentencepiece",
         "psutil",
@@ -52,9 +53,8 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
 )

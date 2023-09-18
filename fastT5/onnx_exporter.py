@@ -57,8 +57,8 @@ def generate_onnx_representation(
     pretrained_version=None,
     model=None,
     output_path=None,
-    input_sequence_length=256,
-    onnx_opset_version=12,  # no other opset versions are tested, change at your own risk
+    input_sequence_length=512,
+    onnx_opset_version=17,  # no other opset versions are tested, change at your own risk
 ):
     """Exports a given huggingface pretrained model, or a given model and tokenizer, to onnx
 
@@ -282,9 +282,8 @@ def quantize(models_name_or_path):
             model_output=output_model_name,
             per_channel=True,
             reduce_range=True, # should be the same as per_channel
-            activation_type=QuantType.QUInt8,
             weight_type=QuantType.QInt8,  # per docs, signed is faster on most CPUs
-            optimize_model=False,
+            optimize_model=False, # Deprecating
         )  # op_types_to_quantize=['MatMul', 'Relu', 'Add', 'Mul' ],
         quant_model_paths.append(output_model_name)
         bar.next()
