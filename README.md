@@ -1,25 +1,6 @@
 ![fastt5 icon](https://raw.githubusercontent.com/Ki6an/fastT5/master/data/fastT5.png)
 
-<h1 style="text-align:center; font-weight:bold;
-font-size:1.875rem">Reduce T5 model size by 3X and increase the inference speed up to 5X.
-</h1>
-
-<p align="center">
-    <a href="https://github.com/Ki6an/fastT5/blob/master/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/ki6an/fastt5?color=blue">
-    </a>
-    <a href="https://github.com/Ki6an/fastT5/actions/workflows/ci-workflow.yml">
-        <img alt="Workflow" src="https://github.com/ki6an/fastT5/actions/workflows/ci-workflow.yml/badge.svg">
-    </a>
-    <a href="https://github.com/Ki6an/fastT5/releases" >
-        <img alt="PYPI release" src="https://img.shields.io/pypi/v/fastt5">
-    </a>
-    <a href="https://github.com/Ki6an/fastT5" >
-        <img alt="Workflow" src="https://img.shields.io/pypi/dm/fastt5">
-    </a>
- </p>
-
-</br>
+## Fork of FastT5 aiming to get latest ORT and OpenVINO runtimes
 
 - [Install](#install)
 - [Usage](#usage)
@@ -42,16 +23,11 @@ fastT5 library allows you to convert a pretrained T5 model to onnx, quantizes it
 
 ## Install
 
-You can install fastT5 from PyPI:
-
-```python
- pip install fastt5
-```
 
 If you want to build from source:
 
 ```python
-git clone https://github.com/Ki6an/fastT5
+git clone https://github.com/SuperSecureHuman/fastT5
 cd fastT5
 pip3 install -e .
 ```
