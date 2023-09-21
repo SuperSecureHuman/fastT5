@@ -1,5 +1,7 @@
 ![fastt5 icon](https://raw.githubusercontent.com/Ki6an/fastT5/master/data/fastT5.png)
 
+[![Tests](https://github.com/SuperSecureHuman/fastT5/actions/workflows/ci-workflow.yml/badge.svg)](https://github.com/SuperSecureHuman/fastT5/actions/workflows/ci-workflow.yml)
+
 ## Fork of FastT5 aiming to get latest ORT and OpenVINO runtimes
 
 - [Install](#install)
