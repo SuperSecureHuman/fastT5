@@ -283,7 +283,7 @@ def quantize(models_name_or_path):
             per_channel=True,
             reduce_range=True, # should be the same as per_channel
             weight_type=QuantType.QInt8,  # per docs, signed is faster on most CPUs
-            optimize_model=False, # Deprecating
+            #optimize_model=False, # Dead since ORT 1.16
         )  # op_types_to_quantize=['MatMul', 'Relu', 'Add', 'Mul' ],
         quant_model_paths.append(output_model_name)
         bar.next()
