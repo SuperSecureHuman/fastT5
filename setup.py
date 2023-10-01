@@ -41,7 +41,7 @@ setuptools.setup(
     install_requires=[
         "torch>=1.7.0,!=1.8.0",  # excludes torch v1.8.0
         "onnx",
-        "onnxruntime>=1.15.0",
+        "onnxruntime>=1.15.1",
         "onnxruntime-openvino",
         "transformers>4.20.0",
         "progress>=1.5",

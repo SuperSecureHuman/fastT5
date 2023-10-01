@@ -173,59 +173,64 @@ def generate_onnx_representation(
 
         dyn_axis_params = {**dyn_axis, **dyn_pkv}
 
-        # decoder to utilize past key values:
-        torch.onnx.export(
-            decoder_with_lm_head,
-            decoder_all_inputs,
-            decoder_path.as_posix(),
-            export_params=True,
-            do_constant_folding=True,
-            opset_version=onnx_opset_version,
-            input_names=decoder_input_names,
-            output_names=decoder_output_names,
-            dynamic_axes=dyn_axis_params,
-        )
+        decoder_filepath = decoder_path.as_posix()
+        if not Path(decoder_filepath).exists():
+            torch.onnx.export(
+                decoder_with_lm_head,
+                decoder_all_inputs,
+                decoder_filepath,
+                export_params=True,
+                do_constant_folding=True,
+                opset_version=onnx_opset_version,
+                input_names=decoder_input_names,
+                output_names=decoder_output_names,
+                dynamic_axes=dyn_axis_params,
+            )
         bar.next()
 
-        torch.onnx.export(
-            simplified_encoder,
-            args=(input_ids, attention_mask),
-            f=encoder_path.as_posix(),
-            export_params=True,
-            opset_version=onnx_opset_version,
-            do_constant_folding=True,
-            input_names=["input_ids", "attention_mask"],
-            output_names=["hidden_states"],
-            dynamic_axes={
-                "input_ids": dyn_axis_general,
-                "attention_mask": dyn_axis_general,
-                "hidden_states": dyn_axis_general,
-            },
-        )
+        encoder_filepath = encoder_path.as_posix()
+        if not Path(encoder_filepath).exists():
+            torch.onnx.export(
+                simplified_encoder,
+                args=(input_ids, attention_mask),
+                f=encoder_filepath,
+                export_params=True,
+                opset_version=onnx_opset_version,
+                do_constant_folding=True,
+                input_names=["input_ids", "attention_mask"],
+                output_names=["hidden_states"],
+                dynamic_axes={
+                    "input_ids": dyn_axis_general,
+                    "attention_mask": dyn_axis_general,
+                    "hidden_states": dyn_axis_general,
+                },
+            )
         bar.next()
-        # initial decoder to produce past key values
-        torch.onnx.export(
-            decoder_with_lm_head_init,
-            (input_ids_dec, attention_mask_dec, enc_out),
-            init_decoder_path.as_posix(),
-            export_params=True,
-            opset_version=onnx_opset_version,
-            input_names=[
-                "input_ids",
-                "encoder_attention_mask",
-                "encoder_hidden_states",
-            ],
-            output_names=["logits", "past_key_values"],
-            dynamic_axes={
-                # batch_size, seq_length = input_shape
-                "input_ids": dyn_axis_general,
-                "encoder_attention_mask": dyn_axis_general,
-                "encoder_hidden_states": dyn_axis_general,
-                "logits": dyn_axis_general,
-                "past_key_values": dyn_axis_general,
-            },
-        )
+
+        init_decoder_filepath = init_decoder_path.as_posix()
+        if not Path(init_decoder_filepath).exists():
+            torch.onnx.export(
+                decoder_with_lm_head_init,
+                (input_ids_dec, attention_mask_dec, enc_out),
+                init_decoder_filepath,
+                export_params=True,
+                opset_version=onnx_opset_version,
+                input_names=[
+                    "input_ids",
+                    "encoder_attention_mask",
+                    "encoder_hidden_states",
+                ],
+                output_names=["logits", "past_key_values"],
+                dynamic_axes={
+                    "input_ids": dyn_axis_general,
+                    "encoder_attention_mask": dyn_axis_general,
+                    "encoder_hidden_states": dyn_axis_general,
+                    "logits": dyn_axis_general,
+                    "past_key_values": dyn_axis_general,
+                },
+            )
         bar.next()
+
         bar.finish()
 
     return encoder_path, decoder_path, init_decoder_path
@@ -271,21 +276,25 @@ def quantize(models_name_or_path):
     """
     from onnxruntime.quantization import quantize_dynamic, QuantType
 
-    bar = Bar("Quantizing...", max=3)
+    bar = Bar("Quantizing...", max=len(models_name_or_path))
 
     quant_model_paths = []
     for model in models_name_or_path:
         model_name = model.as_posix()
         output_model_name = f"{model_name[:-5]}-quantized.onnx"
-        quantize_dynamic(
-            model_input=model_name,
-            model_output=output_model_name,
-            per_channel=True,
-            reduce_range=True, # should be the same as per_channel
-            weight_type=QuantType.QInt8,  # per docs, signed is faster on most CPUs
-            #optimize_model=False, # Dead since ORT 1.16
-        )  # op_types_to_quantize=['MatMul', 'Relu', 'Add', 'Mul' ],
+        output_path = Path(output_model_name)
+
+        # Check if the quantized model already exists
+        if not output_path.exists():
+            quantize_dynamic(
+                model_input=model_name,
+                model_output=output_model_name,
+                per_channel=True,
+                reduce_range=True,  # should be the same as per_channel
+                weight_type=QuantType.QInt8,  # per docs, signed is faster on most CPUs
+            )  # op_types_to_quantize=['MatMul', 'Relu', 'Add', 'Mul' ],
         quant_model_paths.append(output_model_name)
+
         bar.next()
 
     bar.finish()

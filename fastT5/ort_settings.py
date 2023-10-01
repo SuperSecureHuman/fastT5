@@ -19,8 +19,9 @@ def get_onnx_runtime_sessions(
     parallel_exe_mode: bool = True,
     n_threads: int = 0,
     provider=[
-        "CPUExecutionProvider",
+        "OpenVINOExecutionProvider",
     ],
+    provider_options: dict = None,
 ) -> InferenceSession:
     """
             Optimizes the model
@@ -49,11 +50,11 @@ def get_onnx_runtime_sessions(
 
     if default:
 
-        encoder_sess = InferenceSession(str(path_to_encoder), providers=provider)
+        encoder_sess = InferenceSession(str(path_to_encoder), providers=provider, provider_options=provider_options)
 
-        decoder_sess = InferenceSession(str(path_to_decoder), providers=provider)
+        decoder_sess = InferenceSession(str(path_to_decoder), providers=provider, provider_options=provider_options)
 
-        decoder_sess_init = InferenceSession(str(path_to_initial_decoder), providers=provider)
+        decoder_sess_init = InferenceSession(str(path_to_initial_decoder), providers=provider, provider_options=provider_options)
 
     else:
 
@@ -92,5 +93,7 @@ def get_onnx_runtime_sessions(
         decoder_sess_init = InferenceSession(
             str(path_to_initial_decoder), options, providers=provider
         )
+        
+    print("ORT EPs:", encoder_sess.get_providers())
 
     return encoder_sess, decoder_sess, decoder_sess_init
